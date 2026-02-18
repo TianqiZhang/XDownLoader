@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>X Article Exporter</title>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        margin: 12px;
+        width: 320px;
+        color: #0f1419;
+      }
+
+      h1 {
+        font-size: 14px;
+        margin: 0 0 10px;
+      }
+
+      label {
+        display: block;
+        font-size: 12px;
+        margin-bottom: 6px;
+      }
+
+      input[type="number"] {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 8px;
+        font-size: 13px;
+        margin-bottom: 10px;
+      }
+
+      button {
+        width: 100%;
+        padding: 9px;
+        border: 0;
+        border-radius: 6px;
+        font-size: 13px;
+        background: #1d9bf0;
+        color: #fff;
+        cursor: pointer;
+      }
+
+      button:disabled {
+        opacity: 0.6;
+        cursor: default;
+      }
+
+      #status {
+        margin-top: 10px;
+        min-height: 34px;
+        font-size: 12px;
+        line-height: 1.4;
+        white-space: pre-wrap;
+      }
+
+      .hint {
+        color: #536471;
+        font-size: 11px;
+        margin-top: 6px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Export Current X Article</h1>
+
+    <label for="imageDelay">Image delay (ms)</label>
+    <input id="imageDelay" type="number" min="0" step="100" value="1200" />
+
+    <button id="exportBtn">Export Markdown + Images</button>
+    <div class="hint">Adds 0-249ms random jitter between image downloads.</div>
+
+    <div id="status"></div>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

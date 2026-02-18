@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "X Article Markdown Exporter",
+  "version": "1.0.0",
+  "description": "Export X long articles to Markdown and download article images.",
+  "permissions": ["activeTab", "tabs", "downloads", "storage"],
+  "host_permissions": [
+    "https://x.com/*",
+    "https://twitter.com/*",
+    "https://pbs.twimg.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Export X Article",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://x.com/*", "https://twitter.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
