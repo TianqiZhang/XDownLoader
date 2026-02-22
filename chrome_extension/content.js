@@ -278,6 +278,7 @@
 
     return {
       title: metadata.title || DEFAULT_TITLE,
+      publishedAt: metadata.datetime || '',
       sourceUrl: metadata.sourceUrl,
       markdown,
       images: state.images

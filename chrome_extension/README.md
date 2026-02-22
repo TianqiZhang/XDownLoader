@@ -12,15 +12,17 @@
 1. Open a long article page on `https://x.com/...`.
 2. Click the extension icon.
 3. Set image delay (ms), e.g. `1200`.
-4. Click **Export Markdown + Images**.
+4. Click **Choose Folder + Export**.
+5. Pick the parent folder.
 
-Output is downloaded to your Downloads folder under:
+Output is created under the chosen parent folder:
 
-- `XArticleExports/<article-title>-<timestamp>/article.md`
-- `XArticleExports/<article-title>-<timestamp>/images/*`
+- `<date>-<article-title>/article.md`
+- `<date>-<article-title>/images/*`
 
 ## Notes
 
 - The extension extracts content from the live DOM (`twitterArticleRichTextView`).
 - It includes a delay plus random jitter (0-249ms) between image downloads.
+- `date` comes from article publish timestamp when available, otherwise current date.
 - If page structure changes, update `content.js` selectors.

@@ -3,7 +3,7 @@
   "name": "X Article Markdown Exporter",
   "version": "1.0.0",
   "description": "Export X long articles to Markdown and download article images.",
-  "permissions": ["activeTab", "tabs", "downloads", "storage"],
+  "permissions": ["activeTab", "tabs", "downloads", "storage", "scripting"],
   "host_permissions": [
     "https://x.com/*",
     "https://twitter.com/*",

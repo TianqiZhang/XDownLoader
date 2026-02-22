@@ -30,8 +30,20 @@ function downloadFile(options) {
   });
 }
 
-function timestampForPath() {
-  return new Date().toISOString().replace(/[:.]/g, '-');
+function formatDatePrefix(isoDatetime) {
+  if (isoDatetime) {
+    const parsed = new Date(isoDatetime);
+    if (!Number.isNaN(parsed.getTime())) {
+      return parsed.toISOString().slice(0, 10);
+    }
+  }
+  return new Date().toISOString().slice(0, 10);
+}
+
+function buildFolderName(payload) {
+  const datePrefix = formatDatePrefix(payload && payload.publishedAt);
+  const title = sanitizeFilename((payload && payload.title) || 'x-article');
+  return `${datePrefix}-${title}`;
 }
 
 function parseDelay(options) {
@@ -46,8 +58,8 @@ async function downloadExport(payload, options) {
   }
 
   const delayMs = parseDelay(options);
-  const title = sanitizeFilename(payload.title || 'x-article');
-  const baseDir = `XArticleExports/${title}-${timestampForPath()}`;
+  const folderName = buildFolderName(payload);
+  const baseDir = folderName;
 
   await downloadFile({
     url: dataUrlForText(payload.markdown),
