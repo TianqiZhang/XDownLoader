@@ -1,6 +1,7 @@
 const DEFAULT_DELAY_MS = 1200;
 
 const delayInput = document.getElementById('imageDelay');
+const skipImagesInput = document.getElementById('skipImages');
 const exportBtn = document.getElementById('exportBtn');
 const statusEl = document.getElementById('status');
 
@@ -76,7 +77,7 @@ function injectContentScript(tabId) {
     chrome.scripting.executeScript(
       {
         target: { tabId },
-        files: ['content.js']
+        files: ['converter.js', 'content.js']
       },
       () => {
         const err = chrome.runtime.lastError;
@@ -105,18 +106,22 @@ function sendRuntimeMessage(message) {
 
 async function loadSettings() {
   return new Promise((resolve) => {
-    chrome.storage.local.get({ imageDelayMs: DEFAULT_DELAY_MS }, (result) => {
+    chrome.storage.local.get({ imageDelayMs: DEFAULT_DELAY_MS, skipImages: false }, (result) => {
       const value = Number(result.imageDelayMs);
       const delayMs = Number.isFinite(value) ? Math.max(0, Math.floor(value)) : DEFAULT_DELAY_MS;
-      resolve(delayMs);
+      resolve({ delayMs, skipImages: !!result.skipImages });
     });
   });
 }
 
-async function saveSettings(delayMs) {
+async function saveSettings(delayMs, skipImages) {
   return new Promise((resolve) => {
-    chrome.storage.local.set({ imageDelayMs: delayMs }, () => resolve());
+    chrome.storage.local.set({ imageDelayMs: delayMs, skipImages }, () => resolve());
   });
+}
+
+function stripImageMarkdown(markdown) {
+  return markdown.replace(/!\[[^\]]*\]\([^)]*\)\n?/g, '').replace(/\n{3,}/g, '\n\n');
 }
 
 function parseDelay() {
@@ -222,7 +227,8 @@ async function handleExport() {
 
   try {
     const delayMs = parseDelay();
-    await saveSettings(delayMs);
+    const skipImages = skipImagesInput.checked;
+    await saveSettings(delayMs, skipImages);
 
     const tab = await getActiveTab();
     if (!isSupportedUrl(tab.url)) {
@@ -251,10 +257,15 @@ async function handleExport() {
       throw new Error(extraction && extraction.error ? extraction.error : 'Extraction failed.');
     }
 
+    if (skipImages) {
+      extraction.payload.markdown = stripImageMarkdown(extraction.payload.markdown);
+      extraction.payload.images = [];
+    }
+
     const imageCount = Array.isArray(extraction.payload.images) ? extraction.payload.images.length : 0;
 
     if (parentHandle) {
-      setStatus(`Saving markdown + ${imageCount} images...`);
+      setStatus(skipImages ? 'Saving markdown (no images)...' : `Saving markdown + ${imageCount} images...`);
       const result = await exportToPickedFolder(extraction.payload, parentHandle, delayMs);
       setStatus(`Done. Saved to selected folder: ${result.folderName}`);
       return;
@@ -280,8 +291,9 @@ async function handleExport() {
 }
 
 async function init() {
-  const delayMs = await loadSettings();
-  delayInput.value = String(delayMs);
+  const settings = await loadSettings();
+  delayInput.value = String(settings.delayMs);
+  skipImagesInput.checked = settings.skipImages;
 
   exportBtn.addEventListener('click', handleExport);
 }
